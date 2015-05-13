@@ -17,7 +17,7 @@ task oneJar(type: OneJar) {
 task buildJar(type: Copy, dependsOn: oneJar) {
     from 'config.yml'
     from 'build/libs/AuthenticationApplication.jar'
-    into '../../docker/volume-authentication'
+    into '../../lxc/volume-authentication'
 }
 
 artifacts {

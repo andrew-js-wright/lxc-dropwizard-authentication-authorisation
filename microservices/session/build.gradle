@@ -24,7 +24,7 @@ task oneJar(type: OneJar) {
 task buildJar(type: Copy, dependsOn: oneJar) {
     from 'config.yml'
     from 'build/libs/SessionApplication.jar'
-    into '../../docker/volume-session'
+    into '../../lxc/volume-session'
 }
 
 artifacts {

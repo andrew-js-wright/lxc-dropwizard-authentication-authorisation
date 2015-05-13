@@ -26,7 +26,7 @@ task oneJar(type: OneJar) {
 task buildJar(type: Copy, dependsOn: oneJar) {
     from 'config.yml'
     from 'build/libs/FrontendApplication.jar'
-    into '../../docker/volume-frontend'
+    into '../../lxc/volume-frontend'
 }
 
 artifacts {
