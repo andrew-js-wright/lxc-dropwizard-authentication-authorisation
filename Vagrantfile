@@ -31,6 +31,6 @@ Vagrant.configure(2) do |config|
     sudo apt-get install -y vim curl python-software-properties;
     sudo add-apt-repository -y ppa:ubuntu-lxc/stable;
     sudo apt-get update -qq && apt-get install -y lxc
-    sudo /host/provision-dev.sh
+    sudo bash /host/provision-dev.sh
   SHELL
 end

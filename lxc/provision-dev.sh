@@ -1,3 +1,4 @@
+# /usr/bin bash
 function wait_on_ip {
     # Loop until the web container's IP has been assigned
     while [ -z $ip ] ; do
