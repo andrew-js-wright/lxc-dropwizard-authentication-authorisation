@@ -13,6 +13,10 @@ Vagrant.configure(2) do |config|
   config.vm.network "private_network", ip: "10.0.4.2"
   config.vm.network "forwarded_port", guest: 80, host: 8080, host_ip: "127.0.0.1"
 
+  config.vm.provider "virtualbox" do |v|
+          v.memory = 2048
+  end
+
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
   # the path on the guest to mount the folder. And the optional third
