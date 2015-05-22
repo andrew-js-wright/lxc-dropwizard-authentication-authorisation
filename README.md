@@ -95,9 +95,9 @@ you'll need:
 You will also need to build the application before we can deploy it. This is
 done using Gradle as follows:
 
-{% highlight console %} 
+```console
 me@local-machine$ gradle buildJar 
-{% endhighlight %}
+```
 
 ##Deployment Process
 
@@ -136,9 +136,9 @@ directory](https://github.com/andrew-js-wright/lxc-dropwizard-authentication-aut
 from the host and installing LXC. This can be done locally by running the
 following command from the same directory as the `Vagrantfile`:
 
-{% highlight console %} 
+```console
 me@local-machine$ vagrant up 
-{% endhighlight %}
+```
 
 ###Step 2: Deploy Artefacts to Containers
 
@@ -150,7 +150,7 @@ script](https://github.com/andrew-js-wright/lxc-dropwizard-authentication-author
 The lines of the provision script which we are concerned about here are as
 follows:
 
-{% highlight bash %} 
+```bash
 # Create our base container
 sudo lxc-create -t ubuntu -n service-base
 
@@ -162,13 +162,13 @@ sudo lxc-attach -n service-base -- <<SCRIPT
     sudo apt-get update
     sudo apt-get install --fix-missing -y openjdk-7-jre
 SCRIPT
-{% endhighlight %} 
+```
 
 That's our base java container built. We will use that to create all of the
 service containers which use Java. The first one we will create is the 
 `frontend` container.
 
-{% highlight bash %} 
+```bash
 # Stop the base container
 sudo lxc-stop -n service base
 
@@ -182,7 +182,7 @@ sudo cp /host/upstart/frontend.conf /var/lib/lxc/frontend/rootfs/etc/init
 
 # Start the application container
 sudo lxc-stop -n frontend
-{% endhighlight %} 
+```
 
 Remember this is all run on the container host using vagrant which means the
 `/host/` directory is the location we mounted directly from the development machine.
@@ -190,7 +190,7 @@ Remember this is all run on the container host using vagrant which means the
 In order to prove that we can access the application files from within the
 containers let dive inside and poke around.
 
-{% highlight console %} 
+```console
 # Jump onto host VM which has been provisioned with vagrant 
 me@local-machine$ vagrant ssh                                     
 
@@ -202,7 +202,7 @@ root@frontend:/# ls -l /frontend
 total 14132
 -rw-r--r-- 1 root root      412 May 21 17:13 config.yml
 -rw-r--r-- 1 root root 14464552 May 21 17:13 FrontendApplication.jar
-{% endhighlight %}
+```
 
 Great, we've established that we can get something that has been developed on
 a developers machine, onto an LXC container relatively painlessly. Now how do
@@ -220,7 +220,7 @@ it if it dies. To do this all we need is a
 configuration file following file at the location `/etc/init/frontend.conf`
 which will have the following contents:
 
-{% highlight bash %} 
+```bash
 # Front ends init script for upstart 
 start on file system and net-device-up IFACE!=lo 
 script 
@@ -228,26 +228,26 @@ script
     server /frontend/config.yml end 
 script 
 respawn 
-{% endhighlight %}
+```
 
 We'll create this file in our mounted host directory and copy it across with
 another line in our provisioning script below:
 
-{% highlight bash %} 
+```bash
 # On the vagrant host copy the upstart configuration from the host system into the container init directory 
 sudo cp /host/frontend.conf
 /var/lib/lxc/frontend/rootfs/etc/init 
-{% endhighlight %}
+```
 
 We can test that our service is running on the container by running the
 following command on the vagrant host. If it returns one line then we've got a
 java process listening on the correct port.
 
-{% highlight console %} 
+```console
 vagrant@vagrant-ubuntu-trusty-64:~$ sudo lxc-attach -n
 frontend -- netstat -plunt | grep java | grep :8081 tcp6       0      0 :::8081
 :::\*                    LISTEN      765/java 
-{% endhighlight %}
+```
 
 Tada! We have successfully implemented our development pipeline, getting our code
 from our development machine to running on a container within a production like
@@ -277,7 +277,7 @@ In this script we'll create the container and install
 [here-docs](http://tldp.org/LDP/abs/html/here-docs.html) to send multiple lines
 to the lxc-attach utility.
 
-{% highlight bash %} 
+```bash
 sudo lxc-create -t ubuntu -n web sudo lxc-start -n web
 
 sudo lxc-attach -n web -- apt-get update sudo lxc-attach -n web -- apt-get -y
@@ -289,14 +289,14 @@ http://openresty.org/download/ngx_openresty-1.7.10.1.tar.gz tar xzvf
 ngx_openresty-1.7.10.1.tar.gz cd ngx_openresty-1.7.10.1 ./configure
 --with-luajit --with-http_gzip_static_module --with-http_ssl_module
 --with-pcre-jit make make install start web SCRIPT 
-{% endhighlight %}
+```
 
 The web provision script is ran from the original provision script. Once
 we have re-provisioned the boxes (either by running `vagrant provision` or
 `vagrant destroy && vagrant up`) we can test that nginx is running and listening
 on the desired port as follows.
 
-{% highlight console %} 
+```console
 me@local-machine$ vagrant ssh
 vagrant@vagrant-ubuntu-trusty-64:~$ curl $(sudo lxc-info -iH -n web):8080
 <html>
@@ -306,7 +306,7 @@ vagrant@vagrant-ubuntu-trusty-64:~$ curl $(sudo lxc-info -iH -n web):8080
 <hr><center>openresty/1.7.10.1</center>
 </body>
 </html>
-{% endhighlight %}
+```
 
 That isn't just any old error we're getting back from the curl that's an
 NGINX error, which means the web server is listen on the web container's
@@ -321,7 +321,7 @@ virtual ethernet connection to a bridge on the host machine. This allows the
 host to access the container and visa versa. Lets ping a container from the
 vagrant host to prove that we can communicate with it.
 
-{% highlight console %} 
+```console
 vagrant@vagrant-ubuntu-trusty-64:~$ ping -c 3 $(sudo
 lxc-info -n frontend -iH) PING 10.0.3.108 (10.0.3.108) 56(84) bytes of data.
 64 bytes from 10.0.3.108: icmp_seq=1 ttl=64 time=0.039 ms 
@@ -330,7 +330,7 @@ lxc-info -n frontend -iH) PING 10.0.3.108 (10.0.3.108) 56(84) bytes of data.
 
 --- 10.0.3.108 ping statistics --- 3 packets transmitted, 3 received, 0% packet
 loss, time 2000ms rtt min/avg/max/mdev = 0.039/0.084/0.130/0.038 ms 
-{% endhighlight %}
+```
 
 Note the nested
 [lxc-info](http://man7.org/linux/man-pages/man1/lxc-info.1.html) utility gives
@@ -353,7 +353,7 @@ network bridge assigns each container with an IP address.
 
 See the following section of the provision script:
 
-{% highlight bash %} 
+```bash
 # Network containers 
 echo "$(sudo lxc-info -n frontend -iH) frontend" | sudo tee -a /var/lib/lxc/web/rootfs/etc/hosts 
 echo "$(sudo lxc-info -n authentication -iH) authentication" | sudo tee -a /var/lib/lxc/web/rootfs/etc/hosts 
@@ -361,12 +361,12 @@ echo "$(sudo lxc-info -n session -iH) session" | sudo tee -a /var/lib/lxc/web/ro
 
 echo "$(sudo lxc-info -n authorisation -iH) authorisation" | sudo tee -a /var/lib/lxc/person/rootfs/etc/hosts 
 echo "$(sudo lxc-info -n person -iH) person" | sudo tee -a /var/lib/lxc/frontend/rootfs/etc/hosts 
-{% endhighlight %}
+```
 
 Once this has been run we can ping the frontend container from the web one as
 follows:
 
-{% highlight console %} 
+```console
 vagrant@vagrant-ubuntu-trusty-64:~$ sudo lxc-attach -n web -- ping frontend -c 3 
 PING frontend (10.0.3.151) 56(84) bytes of data.
   64 bytes from frontend (10.0.3.151): icmp_seq=1 ttl=64 time=0.141 ms
@@ -376,15 +376,16 @@ PING frontend (10.0.3.151) 56(84) bytes of data.
 --- frontend ping statistics --- 
 3 packets transmitted, 3 received, 0% packet loss, 
 time 1998ms rtt min/avg/max/mdev = 0.096/0.114/0.141/0.021 ms 
-{% endhighlight %}
+```
 
 Lets try to hit the frontend service which is running on the frontend box from
 the web container now:
 
-{% highlight console %} 
+```console
 vagrant@vagrant-ubuntu-trusty-64:~$ sudo lxc-attach -n web -- curl frontend:8081 | grep Persons 
 <h2><a href="/persons">View Persons</a></h2> 
-{% endhighlight %} 
+```
+
 We have successfully established the link
 between the web container and the service running on the frontend container.
 
@@ -409,7 +410,7 @@ requests coming in on port 80 of the host get sent to the web container on port
 8080. We can do this and verify that the firewall has been updated with the
 following commands.
 
-{% highlight console %} 
+```console
 vagrant@vagrant-ubuntu-trusty-64:~$ sudo iptables -t nat -A PREROUTING -i eth0 -p tcp --dport 80 -j DNAT --to $(sudo lxc-info -iH -n web):8080 
 vagrant@vagrant-ubuntu-trusty-64:~$ sudo iptables -t nat -L 
 Chain PREROUTING (policy ACCEPT) target     prot opt source               destination
@@ -421,7 +422,7 @@ Chain OUTPUT (policy ACCEPT) target     prot opt source                   destin
 
 Chain POSTROUTING (policy ACCEPT) target     prot opt source destination 
 MASQUERADE  all  --  10.0.3.0/24         !10.0.3.0/24 
-{% endhighlight %}
+```
 
 Now the final test. Log out of the vagrant machine by typing `exit` and navigate
 to `localhost:8080` on the web browser. This should show you the first page of the application.
