@@ -12,10 +12,9 @@ if ! sudo lxc-ls | grep service-base > /dev/null
 then
 	sudo lxc-create -t ubuntu -n service-base
 	sudo lxc-start -n service-base
-	sleep 2s
 	sudo lxc-attach -n service-base -- << SCRIPT
 sudo apt-get update
-ping -c 1 archive.ubuntu.com && sudo apt-get install --fix-missing -y openjdk-7-jre
+sudo apt-get install --fix-missing -y openjdk-7-jre
 SCRIPT
 fi
 sudo lxc-stop -n service-base
